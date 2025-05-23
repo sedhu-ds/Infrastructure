@@ -1,0 +1,58 @@
+# version: '3.8'
+# services:
+#   backend:
+#     build: ../backend
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       - DATABASE_URL=postgresql://admin:your-password@<rds-endpoint>:5432/doc_management
+#       - SECRET_KEY=<your-secret-key>
+#   frontend:
+#     build: ../frontend
+#     ports:
+#       - "80:80"
+#     depends_on:
+#       - backend
+
+
+
+# version: "3.9"
+
+# services:
+#   app:
+#     build: .
+#     container_name: doc_mgmt_app
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       - DATABASE_URL=postgresql://admin:your-password@<rds-endpoint>:5432/doc_management
+#       - SECRET_KEY=your-secret-key
+#     restart: unless-stopped
+
+
+version: '3.8'
+
+services:
+  backend:
+    build: ../backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://admin:your-password@<rds-endpoint>:5432/doc_management
+      - SECRET_KEY=<your-secret-key>
+    restart: unless-stopped
+    # Optional: healthcheck to ensure backend service is up
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  frontend:
+    build: ../frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
